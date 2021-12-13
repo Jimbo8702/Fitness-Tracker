@@ -33,30 +33,24 @@ app.get("/exercise", (req, res) => {
 //api/workouts
 app.get("/api/workouts", (req, res) => {
   Workout.find()
-
     .then((dbwork) => {
       res.json(dbwork);
     })
     .catch((err) => {
       res.json(err);
     });
-
-  // var aggr = Workout.aggregate([
-  //   {
-  //     $sum: {
-  //       exercise: duration,
-  //     },
-  //   },
-  // ]);
-  // console.log(aggr);
-  // // aggr.options = { allowDiskUse: true };
-  // aggr.exec(function (err, workout) {
-  //   if (err) res.send(err);
-  //   res.json(workout);
-  // });
 });
 //api/workouts/range
-app.get("/api/workouts/range", (req, res) => {});
+app.get("/api/workouts/range", (req, res) => {
+  Workout.find({})
+    .then((workout) => {
+      console.log("Found Workout");
+      res.json(workout);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+});
 // put route
 //api/workout/id
 app.put("/api/workouts/:id", async (req, res) => {
