@@ -2,10 +2,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Workout = require("./models/workoutmodel");
 const path = require("path");
+const mongojs = require("mongojs");
+const logger = require("morgan");
+
 const PORT = process.env.PORT || 3000;
 
 const app = express();
 
+app.use(logger("dev"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -36,33 +40,36 @@ app.get("/api/workouts", (req, res) => {
     .catch((err) => {
       res.json(err);
     });
+
+  // var aggr = Workout.aggregate([
+  //   {
+  //     $sum: {
+  //       exercise: duration,
+  //     },
+  //   },
+  // ]);
+  // console.log(aggr);
+  // // aggr.options = { allowDiskUse: true };
+  // aggr.exec(function (err, workout) {
+  //   if (err) res.send(err);
+  //   res.json(workout);
+  // });
 });
 //api/workouts/range
 app.get("/api/workouts/range", (req, res) => {});
 // put route
 //api/workout/id
-app.put("/api/workouts/:id", (req, res) => {
-  var aggr = Workout.aggregate([
-    {
-      $match: {
-        _id: Number(req.params.id),
-      },
-    },
-    {
-      $addFields: {
-        exercise: req.body,
-      },
-    },
-  ]);
-  // aggr.options = { allowDiskUse: true };
-  aggr.exec(function (err, workout) {
-    if (err) res.send(err);
+app.put("/api/workouts/:id", async (req, res) => {
+  //update push to array exercises $push
+  console.log(req.body);
+  Workout.updateOne(
+    { _id: mongojs.ObjectId(req.params.id) },
+    { $push: { exercise: req.body } }
+  ).then((workout) => {
     res.json(workout);
   });
 });
 
-// post routes
-//adds exercise field to a workout
 // api/workouts
 
 app.post("/api/workouts", ({ body }, res) => {
